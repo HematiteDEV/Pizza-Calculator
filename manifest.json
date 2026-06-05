@@ -1,0 +1,25 @@
+{
+  "name": "ماشین حساب خمیر پیتزا",
+  "short_name": "خمیر پیتزا",
+  "description": "ابزار محاسبه دقیق مواد اولیه خمیر پیتزا بر اساس درصد نانوا",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

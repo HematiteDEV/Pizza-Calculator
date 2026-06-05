@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ماشین حساب خمیر پیتزا</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="خمیر پیتزا">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ---------- VARIABLES & THEME ---------- */
+        :root {
+            --bg-main: #09090b;
+            --bg-card: #141417;
+            --bg-input: #1c1c1f;
+            --border: #27272a;
+            --border-focus: #ff4747;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --accent: #f59e0b;
+            
+            --it-green: #1b8a43;
+            --it-white: #ffffff;
+            --it-red: #d62828;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Vazirmatn', system-ui, -apple-system, Tahoma, sans-serif;
+            color: var(--text-main);
+            background: var(--bg-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        /* (بقیه استایل‌ها دقیقا همان کدهای قبلی است) */
+        .app-container { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; }
+        .flag-line { position: absolute; top: 0; left: 0; right: 0; height: 5px; display: flex; width: 100%; }
+        .flag-g { flex: 1; background: var(--it-green); }
+        .flag-w { flex: 1; background: var(--it-white); }
+        .flag-r { flex: 1; background: var(--it-red); }
+        .app-header { padding: 32px 24px 16px 24px; text-align: center; }
+        .app-header h1 { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
+        .app-content { padding: 0 24px 24px 24px; }
+        .form-section { margin-bottom: 24px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .input-group.hero input { background: #1a1a1e; border-color: #2e2e33; font-size: 1.5rem; font-weight: 700; color: #ffffff; padding: 14px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        input[type="number"] { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: var(--text-main); font-size: 1.1rem; font-family: 'Vazirmatn', sans-serif; text-align: center; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        input[type="number"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.12); }
+        .switch-container { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 16px; border-radius: 14px; border: 1px solid var(--border); cursor: pointer; user-select: none; margin-bottom: 16px; transition: background 0.2s; }
+        .switch-container:hover { background: #232326; }
+        .switch-container span { font-size: 0.9rem; font-weight: 500; }
+        .toggle-switch { appearance: none; width: 44px; height: 24px; background: #3f3f46; border-radius: 99px; position: relative; cursor: pointer; transition: background 0.2s ease; }
+        .toggle-switch:checked { background: var(--border-focus); }
+        .toggle-switch::before { content: ''; position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 3px; right: 3px; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toggle-switch:checked::before { transform: translateX(-20px); }
+        #preferment-settings { background: #111113; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .btn-preset { padding: 12px 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .btn-preset:hover { border-color: var(--accent); background: #242429; }
+        .results-box { background: #0d0d0f; border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-top: 8px; }
+        .section-title { color: var(--accent); font-size: 1rem; font-weight: 700; margin: 20px 0 12px 0; padding-bottom: 8px; border-bottom: 1px dashed #2a2a30; }
+        .section-title:first-child { margin-top: 0; }
+        .result-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); }
+        .result-row:last-child { margin-bottom: 0; }
+        .result-label { font-weight: 500; }
+        .result-dots { flex-grow: 1; border-bottom: 1px dotted #3f3f46; margin: 0 12px; opacity: 0.6; position: relative; top: -4px; }
+        .result-value { color: #ffffff; font-weight: 700; background: #1a1a1e; padding: 4px 10px; border-radius: 8px; border: 1px solid #27272a; direction: rtl; }
+        .note { font-size: 0.8rem; color: #71717a; margin-top: 12px; line-height: 1.6; background: #131316; padding: 10px; border-radius: 8px; }
+        .error-message { color: #ef4444; background: rgba(239, 68, 68, 0.1); font-size: 0.85rem; font-weight: 500; text-align: center; padding: 12px; border-radius: 10px; line-height: 1.6; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="flag-line">
+            <div class="flag-g"></div>
+            <div class="flag-w"></div>
+            <div class="flag-r"></div>
+        </div>
+
+        <div class="app-header">
+            <h1>🍕 ماشین حساب خمیر پیتزا</h1>
+        </div>
+
+        <div class="app-content">
+            <div class="form-section">
+                <div class="input-group hero">
+                    <label for="totalWeight">وزن کل خمیر (گرم)</label>
+                    <input type="number" id="totalWeight" value="1000">
+                </div>
+
+                <div class="input-group">
+                    <label for="hydration">هیدراتاسیون (درصد آب)</label>
+                    <input type="number" id="hydration" value="65">
+                </div>
+
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label for="salt">درصد نمک</label>
+                        <input type="number" id="salt" value="2.5" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="yeast">درصد مخمر خشک</label>
+                        <input type="number" id="yeast" value="0.6" step="0.05">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label class="switch-container">
+                    <span>استفاده از پیش‌تخمیر (Biga / Poolish)</span>
+                    <input type="checkbox" id="usePreferment" class="toggle-switch">
+                </label>
+
+                <div id="preferment-settings" class="hidden">
+                    <div class="preset-grid">
+                        <button type="button" class="btn-preset" onclick="applyPreset('poolish')">روش Poolish (۱۰۰٪)</button>
+                        <button type="button" class="btn-preset" onclick="applyPreset('biga')">روش Biga (۴۵٪)</button>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label for="prefFlourPercent">درصد آرد استارتر</label>
+                            <input type="number" id="prefFlourPercent" value="33">
+                        </div>
+                        <div class="input-group">
+                            <label for="prefHydration">رطوبت استارتر (٪)</label>
+                            <input type="number" id="prefHydration" value="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsBox" class="results-box"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('سرویس ورکر با موفقیت ثبت شد:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('خطا در ثبت سرویس ورکر:', error);
+                    });
+            });
+        }
+
+        // --- 2. Calculator Logic ---
+        const totalWeightEl = document.getElementById('totalWeight');
+        const hydrationEl = document.getElementById('hydration');
+        const saltEl = document.getElementById('salt');
+        const yeastEl = document.getElementById('yeast');
+        
+        const prefermentCheckbox = document.getElementById('usePreferment');
+        const prefermentSettings = document.getElementById('preferment-settings');
+        const prefFlourPercentEl = document.getElementById('prefFlourPercent');
+        const prefHydrationEl = document.getElementById('prefHydration');
+        
+        const resultsBox = document.getElementById('resultsBox');
+        const numericInputs = document.querySelectorAll('input[type="number"]');
+
+        function applyPreset(type) {
+            if (type === "poolish") {
+                prefFlourPercentEl.value = 33;
+                prefHydrationEl.value = 100;
+            } else if (type === "biga") {
+                prefFlourPercentEl.value = 50;
+                prefHydrationEl.value = 45;
+            }
+            calculateDough();
+        }
+
+        function createResultRow(label, value) {
+            return `
+                <div class="result-row">
+                    <span class="result-label">${label}</span>
+                    <div class="result-dots"></div>
+                    <span class="result-value">${value} گرم</span>
+                </div>
+            `;
+        }
+
+        function calculateDough() {
+            const totalWeight = parseFloat(totalWeightEl.value) || 0;
+            const hydration = parseFloat(hydrationEl.value) || 0;
+            const salt = parseFloat(saltEl.value) || 0;
+            const yeast = parseFloat(yeastEl.value) || 0;
+
+            if (totalWeight <= 0) {
+                resultsBox.innerHTML = `<div class="error-message">لطفاً وزن کل خمیر را به درستی وارد کنید.</div>`;
+                return;
+            }
+
+            const totalPercentage = 100 + hydration + salt + yeast;
+            const totalFlour = totalWeight / (totalPercentage / 100);
+            const totalWater = totalFlour * (hydration / 100);
+            const totalSalt = totalFlour * (salt / 100);
+            const totalYeast = totalFlour * (yeast / 100);
+
+            let html = '';
+
+            if (!prefermentCheckbox.checked) {
+                html += `
+                    <div class="section-title">مواد لازم (روش مستقیم)</div>
+                    ${createResultRow('🌾 آرد خالص', totalFlour.toFixed(1))}
+                    ${createResultRow('💧 آب مصرفی', totalWater.toFixed(1))}
+                    ${createResultRow('🧂 نمک دریا', totalSalt.toFixed(1))}
+                    ${createResultRow('🦠 مخمر خشک', totalYeast.toFixed(1))}
+                `;
+            } else {
+                const prefFlourPercent = parseFloat(prefFlourPercentEl.value) || 0;
+                const prefHydration = parseFloat(prefHydrationEl.value) || 0;
+
+                const prefFlour = totalFlour * (prefFlourPercent / 100);
+                const prefWater = prefFlour * (prefHydration / 100);
+
+                const mainFlour = totalFlour - prefFlour;
+                const mainWater = totalWater - prefWater;
+
+                if (prefWater > totalWater) {
+                    resultsBox.innerHTML = `
+                        <div class="error-message">
+                            ⚠️ آب مورد نیاز پیش‌تخمیر (${prefWater.toFixed(1)} گرم) از کل آب فرمول (${totalWater.toFixed(1)} گرم) بیشتر شده است.<br>درصد هیدراتاسیون یا مقدار آرد استارتر را کاهش دهید.
+                        </div>`;
+                    return;
+                }
+
+                html += `
+                    <div class="section-title">مرحله ۱: پیش‌تخمیر (استارتر)</div>
+                    ${createResultRow('🌾 آرد استارتر', prefFlour.toFixed(1))}
+                    ${createResultRow('💧 آب استارتر', prefWater.toFixed(1))}
+                    ${createResultRow('🦠 مخمر (کل)', totalYeast.toFixed(1))}
+                    <div class="note">* در تخمیرهای طولانی، تمام مخمر به استارتر اضافه می‌شود تا فرآیند رشد باکتری‌های مفید آغاز شود.</div>
+
+                    <div class="section-title">مرحله ۲: خمیر اصلی</div>
+                    ${createResultRow('🌾 آرد باقی‌مانده', mainFlour.toFixed(1))}
+                    ${createResultRow('💧 آب باقی‌مانده', mainWater.toFixed(1))}
+                    ${createResultRow('🧂 نمک', totalSalt.toFixed(1))}
+                    <div class="note">* پس از رسیدن استارتر، آن را با مواد مرحله ۲ مخلوط کرده و ورز دهید.</div>
+                `;
+            }
+
+            resultsBox.innerHTML = html;
+        }
+
+        numericInputs.forEach(input => {
+            input.addEventListener('input', calculateDough);
+        });
+
+        prefermentCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                prefermentSettings.classList.remove('hidden');
+            } else {
+                prefermentSettings.classList.add('hidden');
+            }
+            calculateDough();
+        });
+
+        calculateDough();
+    </script>
+</body>
+</html>
