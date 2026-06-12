@@ -44,7 +44,6 @@
             padding: 16px;
         }
 
-        /* (بقیه استایل‌ها دقیقا همان کدهای قبلی است) */
         .app-container { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; }
         .flag-line { position: absolute; top: 0; left: 0; right: 0; height: 5px; display: flex; width: 100%; }
         .flag-g { flex: 1; background: var(--it-green); }
@@ -83,6 +82,24 @@
         .note { font-size: 0.8rem; color: #71717a; margin-top: 12px; line-height: 1.6; background: #131316; padding: 10px; border-radius: 8px; }
         .error-message { color: #ef4444; background: rgba(239, 68, 68, 0.1); font-size: 0.85rem; font-weight: 500; text-align: center; padding: 12px; border-radius: 10px; line-height: 1.6; }
         .hidden { display: none !important; }
+        
+        /* استایل اختصاصی ردیف وزن نهایی واقعی خمیر */
+        .actual-total-row {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--accent);
+        }
+        .actual-total-row strong {
+            color: #ffffff;
+            background: #1a1a1e;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #27272a;
+            margin-right: 4px;
+        }
     </style>
 </head>
 <body>
@@ -101,7 +118,7 @@
         <div class="app-content">
             <div class="form-section">
                 <div class="input-group hero">
-                    <label for="totalWeight">وزن کل خمیر (گرم)</label>
+                    <label for="totalWeight">وزن خمیر مبنا (آرد + آب) (گرم)</label>
                     <input type="number" id="totalWeight" value="1000">
                 </div>
 
@@ -211,11 +228,15 @@
                 return;
             }
 
-            const totalPercentage = 100 + hydration + salt + yeast;
+            // اصلاح هسته محاسبات: وزن کل دریافتی مبنای ۱۰۰٪ آرد + درصد آب است
+            const totalPercentage = 100 + hydration;
             const totalFlour = totalWeight / (totalPercentage / 100);
             const totalWater = totalFlour * (hydration / 100);
             const totalSalt = totalFlour * (salt / 100);
             const totalYeast = totalFlour * (yeast / 100);
+            
+            // محاسبه وزن واقعی نهایی پس از افزودن نمک و مخمر
+            const actualFinalWeight = totalFlour + totalWater + totalSalt + totalYeast;
 
             let html = '';
 
@@ -226,6 +247,7 @@
                     ${createResultRow('💧 آب مصرفی', totalWater.toFixed(1))}
                     ${createResultRow('🧂 نمک دریا', totalSalt.toFixed(1))}
                     ${createResultRow('🦠 مخمر خشک', totalYeast.toFixed(1))}
+                    <div class="actual-total-row">⚖️ وزن نهایی کل خمیر: <strong>${actualFinalWeight.toFixed(1)} گرم</strong></div>
                 `;
             } else {
                 const prefFlourPercent = parseFloat(prefFlourPercentEl.value) || 0;
@@ -257,6 +279,7 @@
                     ${createResultRow('💧 آب باقی‌مانده', mainWater.toFixed(1))}
                     ${createResultRow('🧂 نمک', totalSalt.toFixed(1))}
                     <div class="note">* پس از رسیدن استارتر، آن را با مواد مرحله ۲ مخلوط کرده و ورز دهید.</div>
+                    <div class="actual-total-row">⚖️ وزن نهایی کل خمیر: <strong>${actualFinalWeight.toFixed(1)} گرم</strong></div>
                 `;
             }
 
